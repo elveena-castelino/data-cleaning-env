@@ -177,7 +177,7 @@ This environment is containerized and deployable on **Hugging Face Spaces** usin
 
 ## 👥 Team
 
-* [Your Names Here]
+* Team Bug Smashers: Rian, Amogh, Elveena
 
 ---
 
