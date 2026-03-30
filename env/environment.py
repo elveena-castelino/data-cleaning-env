@@ -1,0 +1,139 @@
+import copy
+from datetime import datetime
+from .models import Observation, Action, StepResult
+from tasks import load_task
+
+MAX_STEPS = 10
+
+
+class DataCleaningEnv:
+    def __init__(self, task_name="easy"):
+        task = load_task(task_name)
+        self.original_dataset = task["dataset"]
+        self.ground_truth = task["ground_truth"]
+
+        self.dataset = None
+        self.step_count = 0
+
+    def reset(self):
+        self.dataset = copy.deepcopy(self.original_dataset)
+        self.step_count = 0
+        return self._get_observation()
+
+    def state(self):
+        return {
+            "dataset": self.dataset,
+            "step_count": self.step_count
+        }
+
+    def step(self, action: Action):
+        self.step_count += 1
+        old_dataset = copy.deepcopy(self.dataset)
+
+        self._apply_action(action)
+
+        errors_before = self._count_errors(old_dataset)
+        errors_after = self._count_errors(self.dataset)
+
+        progress = errors_before - errors_after
+        reward = 0
+
+        if progress > 0:
+            reward += progress * 0.15 + 0.05
+        elif progress == 0:
+            reward -= 0.05
+        else:
+            reward -= 0.25
+
+        if errors_after == 0:
+            reward += 0.5
+
+        done = errors_after == 0 or self.step_count >= MAX_STEPS
+
+        return StepResult(
+            observation=self._get_observation(),
+            reward=reward,
+            done=done,
+            info={"errors_before": errors_before, "errors_after": errors_after}
+        )
+
+    def _get_observation(self):
+        return Observation(
+            dataset=self.dataset,
+            step_count=self.step_count,
+            remaining_errors=self._count_errors(self.dataset)
+        )
+
+    def _count_errors(self, dataset):
+        errors = 0
+        for r, g in zip(dataset, self.ground_truth):
+            for k in g:
+                if r.get(k) != g.get(k):
+                    errors += 1
+        if len(dataset) > len(self.ground_truth): errors += (len(dataset) - len(self.ground_truth)) * len(self.ground_truth[0])
+        if len(dataset) < len(self.ground_truth): errors += (len(self.ground_truth) - len(dataset)) * len(self.ground_truth[0])
+        return errors
+
+    def _apply_action(self, action: Action):
+        if action.action_type == "fill_missing":
+            self._fill_missing(action.column)
+        elif action.action_type == "standardize_name":
+            self._standardize_name()
+        elif action.action_type == "convert_type":
+            self._convert_type(action.column)
+        elif action.action_type == "fix_date_format":
+            self._fix_date()
+        elif action.action_type == "remove_duplicates":
+            self._remove_duplicates()
+
+    def _fill_missing(self, column):
+        values = [r[column] for r in self.dataset if r.get(column) is not None]
+        if not values:
+            return
+        fill = max(set(values), key=values.count)
+        for r in self.dataset:
+            if r.get(column) is None:
+                r[column] = fill
+
+    def _standardize_name(self):
+        for r in self.dataset:
+            if isinstance(r.get("name"), str):
+                name = " ".join(r["name"].strip().split())
+                r["name"] = name.title()
+
+    def _convert_type(self, column):
+        mapping = {"twenty": 20, "thirty": 30}
+        for r in self.dataset:
+            val = r.get(column)
+            if isinstance(val, str):
+                if val.isdigit():
+                    r[column] = int(val)
+                elif val.lower() in mapping:
+                    r[column] = mapping[val.lower()]
+
+    def _fix_date(self):
+        formats = [
+            "%d/%m/%Y",
+            "%m-%d-%Y",
+            "%Y-%m-%d",
+            "%d-%m-%y",
+            "%Y/%m/%d"
+        ]
+
+        for r in self.dataset:
+            for fmt in formats:
+                try:
+                    parsed = datetime.strptime(r["date"], fmt)
+                    r["date"] = parsed.strftime("%B %d, %Y")  # wording format
+                    break
+                except:
+                    continue
+
+    def _remove_duplicates(self):
+        seen, unique = set(), []
+        for r in self.dataset:
+            key = tuple(sorted(r.items()))
+            if key not in seen:
+                seen.add(key)
+                unique.append(r)
+        self.dataset = unique
