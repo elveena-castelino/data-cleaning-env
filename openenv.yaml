@@ -1,0 +1,13 @@
+name: data-cleaning-env
+description: Real-world dataset cleaning environment
+
+tasks:
+  - easy
+  - medium
+  - hard
+
+action_space:
+  type: structured
+
+observation_space:
+  type: structured
