@@ -22,7 +22,7 @@ class DataCleaningEnv:
 
     def state(self):
         return {
-            "dataset": self.dataset,
+            "remaining_errors": self._count_errors(self.dataset),
             "step_count": self.step_count
         }
 
@@ -87,7 +87,9 @@ class DataCleaningEnv:
             self._remove_duplicates()
 
     def _fill_missing(self, column):
-        values = [r[column] for r in self.dataset if r.get(column) is not None]
+        if not column:
+            return  # prevent silent failure
+        values = [r.get(column) for r in self.dataset if r.get(column) is not None]
         if not values:
             return
         fill = max(set(values), key=values.count)
@@ -113,20 +115,27 @@ class DataCleaningEnv:
 
     def _fix_date(self):
         formats = [
-            "%d/%m/%Y",
-            "%m-%d-%Y",
-            "%Y-%m-%d",
-            "%d-%m-%y",
-            "%Y/%m/%d"
+        "%B %d, %Y",   # March 12, 2024 (already correct)
+        "%d/%m/%Y",    # 12/03/2024
+        "%d-%m-%y",    # 12-03-24
+        "%Y/%m/%d",    # 2024/03/12
+        "%Y-%m-%d",    # fallback if exists
         ]
 
         for r in self.dataset:
+            val = r.get("date")
+
+            if not isinstance(val, str):
+                continue
+
+            val = val.strip()
+
             for fmt in formats:
                 try:
-                    parsed = datetime.strptime(r["date"], fmt)
-                    r["date"] = parsed.strftime("%B %d, %Y")  # wording format
+                    parsed = datetime.strptime(val, fmt)
+                    r["date"] = parsed.strftime("%B %d, %Y")  # ALWAYS word format
                     break
-                except:
+                except ValueError:
                     continue
 
     def _remove_duplicates(self):

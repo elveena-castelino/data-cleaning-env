@@ -4,7 +4,7 @@ import copy
 def base_clean_dataset():
     return [
         {"name": "John Doe", "age": 25, "date": "March 12, 2024"},
-        {"name": "Jane Doe", "age": 30, "date": "March 12, 2024"},
+        {"name": "Jane Doe", "age": 25, "date": "March 12, 2024"},
         {"name": "Alice Smith", "age": 22, "date": "March 12, 2024"},
     ]
 

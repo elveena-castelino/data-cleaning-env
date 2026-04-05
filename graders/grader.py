@@ -1,19 +1,15 @@
 from datetime import datetime
 
-
 def normalize_date(date_str):
-    formats = ["%B %d, %Y", "%Y-%m-%d"]
-
-    for fmt in formats:
-        try:
-            return datetime.strptime(date_str, fmt)
-        except:
-            continue
-
-    return date_str
-
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d")
+    except:
+            return None
 
 def grade_dataset(predicted, ground_truth):
+    if len(predicted) != len(ground_truth):
+        return 0.0
+
     total, correct = 0, 0
 
     for p, g in zip(predicted, ground_truth):
