@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
+from pydantic import BaseModel
 from env.environment import DataCleaningEnv
 from env.models import Action
 from graders.grader import grade_dataset
@@ -7,6 +8,10 @@ from tasks import load_task
 app = FastAPI()
 env = None
 task_data = None
+
+
+class ResetRequest(BaseModel):
+    task: str = "easy"
 
 @app.get("/")
 def home():
@@ -25,15 +30,16 @@ def home():
     }
 
 @app.post("/reset")
-def reset(task: str = "easy"):
+def reset(payload: ResetRequest | None = None, task: str | None = Query(None)):
     global env, task_data
-    task_data = load_task(task)
-    env = DataCleaningEnv(task)
+    task_name = task or (payload.task if payload else "easy")
+    task_data = load_task(task_name)
+    env = DataCleaningEnv(task_name)
     return env.reset()
 
 
 @app.post("/step")
-def step(action: dict):
+def step(action: Action):
     global env, task_data
 
     if env is None:
@@ -41,7 +47,7 @@ def step(action: dict):
         env = DataCleaningEnv("easy")
         env.reset()
 
-    return env.step(Action(**action))
+    return env.step(action)
 
 
 @app.get("/state")
@@ -64,9 +70,9 @@ def grader():
 
 
 @app.get("/baseline")
-def baseline():
+def baseline(task: str = "easy"):
     try:
         from inference import run_baseline
-        return run_baseline()
+        return run_baseline(task)
     except Exception as e:
         return {"error": str(e)}

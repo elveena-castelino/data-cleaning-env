@@ -7,7 +7,6 @@ class Observation(BaseModel):
     step_count: int
     remaining_errors: int
 
-
 class Action(BaseModel):
     action_type: Literal[
         "fill_missing",
@@ -16,8 +15,7 @@ class Action(BaseModel):
         "fix_date_format",
         "remove_duplicates"
     ]
-    column: Optional[str] = None
-
+    column: Optional[Literal["age"]] = None
 
 class StepResult(BaseModel):
     observation: Observation
