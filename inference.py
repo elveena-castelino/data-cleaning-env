@@ -12,9 +12,7 @@ load_dotenv()
 
 API_URL = "http://localhost:8000"
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
-
-client = OpenAI(api_key = os.getenv("HF_TOKEN") or os.getenv("API_KEY"))
-
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def choose_action(observation):
     prompt = f"""
