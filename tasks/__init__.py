@@ -1,12 +1,6 @@
-from .easy import get_easy_task
-from .medium import get_medium_task
-from .hard import get_hard_task
+from env.dataset import get_task
 
 def load_task(name):
-    if name == "easy":
-        return get_easy_task()
-    if name == "medium":
-        return get_medium_task()
-    if name == "hard":
-        return get_hard_task()
+    if name in ["easy", "medium", "hard"]:
+        return get_task(name)
     raise ValueError("Invalid task")

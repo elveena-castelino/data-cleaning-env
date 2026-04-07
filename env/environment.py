@@ -2,10 +2,10 @@ import copy
 from datetime import datetime
 from .models import Observation, Action, StepResult
 from tasks import load_task
-from graders import grade_dataset
+from graders.grader import grade_dataset
+from word2number import w2n
 
 MAX_STEPS = 10
-
 
 class DataCleaningEnv:
     def __init__(self, task_name="easy"):
@@ -70,12 +70,18 @@ class DataCleaningEnv:
 
     def _count_errors(self, dataset):
         errors = 0
+
         for r, g in zip(dataset, self.ground_truth):
             for k in g:
                 if r.get(k) != g.get(k):
                     errors += 1
-        if len(dataset) > len(self.ground_truth): errors += (len(dataset) - len(self.ground_truth)) * len(self.ground_truth[0])
-        if len(dataset) < len(self.ground_truth): errors += (len(self.ground_truth) - len(dataset)) * len(self.ground_truth[0])
+
+        if len(dataset) > len(self.ground_truth):
+            errors += (len(dataset) - len(self.ground_truth)) * len(self.ground_truth[0])
+
+        if len(dataset) < len(self.ground_truth):
+            errors += (len(self.ground_truth) - len(dataset)) * len(self.ground_truth[0])
+
         return errors
 
     def _apply_action(self, action: Action):
@@ -92,30 +98,40 @@ class DataCleaningEnv:
 
     def _fill_missing(self, column):
         if not column:
-            return  # prevent silent failure
+            return
+
         values = [r.get(column) for r in self.dataset if r.get(column) is not None]
         if not values:
             return
+
         fill = max(set(values), key=values.count)
+
         for r in self.dataset:
             if r.get(column) is None:
                 r[column] = fill
 
     def _standardize_name(self):
         for r in self.dataset:
-            if isinstance(r.get("name"), str):
-                name = " ".join(r["name"].strip().split())
+            name = r.get("name")
+
+            if isinstance(name, str):
+                name = " ".join(name.strip().split())
                 r["name"] = name.title()
 
     def _convert_type(self, column):
-        mapping = {"twenty": 20, "thirty": 30}
         for r in self.dataset:
             val = r.get(column)
+
             if isinstance(val, str):
+                val = val.strip()
+
                 if val.isdigit():
                     r[column] = int(val)
-                elif val.lower() in mapping:
-                    r[column] = mapping[val.lower()]
+                else:
+                    try:
+                        r[column] = w2n.word_to_num(val)
+                    except:
+                        pass
 
     def _fix_date(self):
         formats = [
@@ -143,10 +159,13 @@ class DataCleaningEnv:
                     continue
 
     def _remove_duplicates(self):
-        seen, unique = set(), []
+        seen = set()
+        unique = []
+
         for r in self.dataset:
             key = tuple(sorted(r.items()))
             if key not in seen:
                 seen.add(key)
                 unique.append(r)
+
         self.dataset = unique

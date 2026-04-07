@@ -1,10 +1,14 @@
 from datetime import datetime
 
 def normalize_date(date_str):
-    try:
-        return datetime.strptime(date_str, "%Y-%m-%d")
-    except:
-            return None
+    formats = ["%B %d, %Y", "%Y-%m-%d", "%d/%m/%Y"]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except:
+            continue
+    return None
 
 def grade_dataset(predicted, ground_truth):
     if len(predicted) != len(ground_truth):

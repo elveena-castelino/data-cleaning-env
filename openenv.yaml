@@ -1,13 +1,29 @@
 name: data-cleaning-env
-description: Real-world dataset cleaning environment
+description: Environment for cleaning structured datasets with real-world errors
 
 tasks:
-  - easy
-  - medium
-  - hard
+  - name: easy
+    description: Fix basic formatting issues like capitalization and simple type conversion
+  - name: medium
+    description: Handle missing values and inconsistent data formats
+  - name: hard
+    description: Perform full data cleaning including duplicates, mixed formats, and multiple column fixes
 
 action_space:
   type: structured
+  description: |
+    Agent selects a cleaning action with optional column.
+    Actions include:
+    - fill_missing
+    - standardize_name
+    - convert_type
+    - fix_date_format
+    - remove_duplicates
 
 observation_space:
   type: structured
+  description: |
+    Observation contains:
+    - dataset: list of records
+    - step_count: number of steps taken
+    - remaining_errors: number of incorrect fields compared to ground truth
