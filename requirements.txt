@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-pydantic
-openai
-requests
-python-dotenv
-numpy
-word2number
-openenv-core
