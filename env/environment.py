@@ -2,6 +2,7 @@ import copy
 from datetime import datetime
 from .models import Observation, Action, StepResult
 from tasks import load_task
+from graders import grade_dataset
 
 MAX_STEPS = 10
 
@@ -63,6 +64,9 @@ class DataCleaningEnv:
             step_count=self.step_count,
             remaining_errors=self._count_errors(self.dataset)
         )
+        
+    def get_score(self):
+        return grade_dataset(self.dataset, self.ground_truth)
 
     def _count_errors(self, dataset):
         errors = 0
