@@ -1,184 +1,181 @@
-# 🧹 Data Cleaning Environment API
+# 🧾 Data Cleaning Analyst Environment (OpenEnv)
 
-A FastAPI-based simulation environment for structured data cleaning tasks.
-This project models data cleaning as a step-by-step decision-making process with rewards and evaluation.
+## 🚀 Overview
+
+This project implements a **real-world OpenEnv environment** simulating the task of a data analyst cleaning unorganised datasets.
+
+Data cleaning is one of the most time-consuming and important steps in real-world data workflows. This environment allows AI agents to learn and be evaluated on:
+
+* Handling missing values
+* Standardizing inconsistent formats
+* Converting incorrect data types
+* Removing duplicates
+---
+
+## 🎯 Why this matters
+
+In real-world data science pipelines:
+
+> **Up to 80% of time is spent cleaning data**
+
+This environment models that workflow in a structured, testable way — making it useful for training and evaluating AI agents. 
+The agent being implemented here works on some of the low priority but necessary tasks required during the cleaning of a dataset and it has notable future scope.
 
 ---
 
-## 🚀 Features
+## 🧠 Environment Design
 
-* Multi-level datasets: **Easy, Medium, Hard**
-* Action-based data cleaning:
+### Observation Space
 
-  * Fill missing values
-  * Standardize names
-  * Convert data types
-  * Fix date formats
-  * Remove duplicates
-* Reward system for tracking progress
-* Baseline agent for automated solving
-* Grader for evaluating dataset accuracy
-
----
-
-## 📂 Project Structure
-
-```
-api/            # FastAPI routes
-env/            # Environment logic
-graders/        # Evaluation logic
-tasks/          # Dataset definitions
-server/         # Deployment entry point
-```
-
----
-
-## ⚙️ Setup & Run Locally
-
-### 1. Clone the repository
-
-```
-git clone https://github.com/elveena-castelino/data-cleaning-env.git
-cd data-cleaning-env
+```json
+{
+  "dataset": [...],
+  "step_count": int,
+  "remaining_errors": int
+}
 ```
 
 ---
 
-### 2. Create virtual environment
+### Action Space
 
-```
-python -m venv .venv
-```
-
-Activate:
-
-* Windows (PowerShell):
-
-```
-.\.venv\Scripts\Activate.ps1
-```
-
-* Windows (CMD):
-
-```
-.venv\Scripts\activate
+```json
+{
+  "action_type": "fill_missing | standardize_name | convert_type | fix_date_format | remove_duplicates",
+  "column": "optional"
+}
 ```
 
 ---
 
-### 3. Install dependencies
+### Reward Function
 
-```
+The reward is **dense and progressive**, encouraging efficient and correct cleaning:
+
+* +0.15 per error fixed
+* +0.05 efficiency bonus
+* -0.05 for ineffective actions
+* -0.25 for worsening dataset
+* +0.5 completion bonus
+
+---
+
+## 🧪 Tasks
+
+### 🟢 Easy — Missing Values
+
+* Single error type
+* Objective: fill missing values
+
+---
+
+### 🟡 Medium — Mixed Issues
+
+* Missing values + inconsistent formats
+* Requires multi-step reasoning
+
+---
+
+### 🔴 Hard — Noisy Data
+
+* Duplicates
+* Incorrect types
+* Multiple date formats
+* Extra spaces and inconsistencies
+
+---
+
+## 🧠 Grading System
+
+Evaluation is deterministic and returns a score between **0.0 → 1.0**.
+
+* Field-level accuracy scoring
+* Partial credit for partially correct rows
+* Exact match yields full score
+
+---
+
+## 🤖 Baseline Agent
+
+A hybrid baseline agent is provided:
+
+* Uses rule-based heuristics for stability
+* Falls back to LLM for generalization
+
+This ensures **reproducible and meaningful baseline scores**.
+
+---
+
+## 🌐 API Endpoints
+
+| Endpoint    | Description            |
+| ----------- | ---------------------- |
+| `/reset`    | Initialize environment |
+| `/step`     | Apply action           |
+| `/state`    | Get current state      |
+| `/tasks`    | List tasks             |
+| `/grader`   | Get final score        |
+| `/baseline` | Run baseline agent     |
+
+---
+
+## 🐳 Setup Instructions
+
+### 1. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-OR:
+### 2. Run locally
 
-```
-pip install uv
-uv sync
-```
-
----
-
-### 4. Run server
-
-```
+```bash
 uvicorn api.app:app --reload
 ```
 
----
+### 3. Run baseline
 
-## 📡 API Endpoints
-
-### Reset environment
-
-```
-POST /reset?task=easy
+```bash
+python inference.py
 ```
 
 ---
 
-### Perform action
+## 🧪 Example (Before → After)
 
-```
-POST /step
-```
-
-Example:
+### Input
 
 ```json
-{
-  "action_type": "fill_missing",
-  "column": "age"
-}
+{"name": "JOHN    DOE", "age": "thirty", "date": "03-12-24"}
 ```
 
----
-
-### Get state
-
-```
-GET /state
-```
-
-Response:
+### Output
 
 ```json
-{
-  "step_count": 1,
-  "remaining_errors": 0
-}
+{"name": "John Doe", "age": 30, "date": "2024-03-12"}
 ```
 
 ---
 
-### Evaluate dataset
+## 🏆 Key Highlights
 
-```
-GET /grader
-```
-
----
-
-### Run baseline
-
-```
-GET /baseline?task=easy
-```
+* Deterministic grading
+* Dense reward shaping
+* Multi-step reasoning environment
+* Fully OpenEnv compliant
+* Dockerized + deployable
 
 ---
 
-## 🧠 How It Works
+## 📦 Deployment
 
-* Start with a dirty dataset
-* Apply actions step-by-step
-* Track remaining errors
-* Receive rewards for improvements
-* Goal: **clean dataset completely**
-
----
-
-## 📌 Notes
-
-* Date format: **"March 12, 2024"**
-* Only `"age"` column is used for:
-
-  * fill_missing
-  * convert_type
+This environment is containerized and deployable on **Hugging Face Spaces** using Docker.
 
 ---
 
 ## 👥 Team
 
-Team Bug Smashers
-
-* Rian
-* Amogh
-* Elveena
+* This project was made and implemented for the participation in the Meta PyTorch OpenEnv Hackathon x Scaler School of Technology.
+* Created by Team Bug Smashers: Rian, Amogh, Elveena
 
 ---
-
-## 📌 Final Note
-
-This project demonstrates how structured environments can support intelligent decision-making systems using rule-based transformations and agent workflows.

@@ -48,25 +48,21 @@ def step(action: Action):
 
     return env.step(action)
 
-
 @app.get("/state")
 def state():
     if env is None:
         return {"error": "Environment not initialized. Call /reset first."}
     return env.state()
 
-
 @app.get("/tasks")
 def tasks():
     return {"tasks": ["easy", "medium", "hard"], "action_schema": Action.schema()}
-
 
 @app.get("/grader")
 def grader():
     if env is None or task_data is None:
         return {"error": "Run /reset before grading."}
     return {"score": grade_dataset(env.dataset, task_data["ground_truth"])}
-
 
 @app.get("/baseline")
 def baseline(task: str = "easy"):

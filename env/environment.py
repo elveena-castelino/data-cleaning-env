@@ -135,7 +135,7 @@ class DataCleaningEnv:
 
     def _fix_date(self):
         formats = [
-        "%B %d, %Y",   # March 12, 2024 (already correct)
+        "%B %d, %Y",   # original 
         "%d/%m/%Y",    # 12/03/2024
         "%d-%m-%y",    # 12-03-24
         "%Y/%m/%d",    # 2024/03/12
