@@ -17,6 +17,7 @@ MAX_TOKENS = 200
 
 client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
+
 def choose_action(observation):
     prompt = f"""
         You are a data cleaning agent.
@@ -58,23 +59,10 @@ def choose_action(observation):
     except Exception:
         return Action(action_type="standardize_name")
 
-def run_task(task_name):
-    env = DataCleaningEnv(task_name)
-    obs = env.reset()
-
-    for _ in range(MAX_STEPS):
-        action = choose_action(obs.dict())
-        result = env.step(action)
-
-        obs = result.observation
-        if result.done:
-            break
-
-    return env.get_score()
 
 def run_baseline(task):
     env = DataCleaningEnv(task)
-    env.reset()
+    obs = env.reset()
 
     actions = [
         Action(action_type="standardize_name"),
@@ -84,62 +72,62 @@ def run_baseline(task):
         Action(action_type="remove_duplicates"),
     ]
 
-    history = []
+    total_reward = 0.0
+    steps_taken = 0
+    result = None
 
-    for _ in range(MAX_STEPS):
+    for step in range(1, MAX_STEPS + 1):
         best_action = None
         best_reward = -float("inf")
 
         for action in actions:
             test_env = DataCleaningEnv(task)
             test_env.dataset = [row.copy() for row in env.dataset]
-            result = test_env.step(action)
+            test_result = test_env.step(action)
 
-            if result.reward > best_reward:
-                best_reward = result.reward
+            if test_result.reward > best_reward:
+                best_reward = test_result.reward
                 best_action = action
 
         result = env.step(best_action)
 
-        history.append({
-            "action": best_action.action_type,
-            "reward": float(result.reward),
-            "remaining_errors": int(result.observation.remaining_errors)
-        })
+        reward = float(result.reward)
+        total_reward += reward
+        steps_taken += 1
+
+        print(f"[STEP] step={step} reward={reward}", flush=True)
 
         if result.done:
             break
 
-    return {
-        "final_dataset": env.dataset,
-        "steps": history,
-        "final_errors": int(result.observation.remaining_errors),
-        "success": result.observation.remaining_errors == 0
-    }
+    final_errors = int(result.observation.remaining_errors) if result else 0
+    success = final_errors == 0
+
+    return total_reward, steps_taken, success
+
 
 def main():
     tasks = ["easy", "medium", "hard"]
-    results = {}
+
+    grand_total_reward = 0.0
+    total_steps = 0
+    success_count = 0
+
+    print("[START] task=data_cleaning", flush=True)
 
     for task in tasks:
-        results[task] = run_baseline(task)
+        total_reward, steps_taken, success = run_baseline(task)
 
-    avg_score = sum(1 if r["success"] else 0 for r in results.values()) / len(results)
+        grand_total_reward += total_reward
+        total_steps += steps_taken
+        success_count += 1 if success else 0
 
-    print("\nDATA CLEANING AGENT RESULTS\n")
+    avg_score = success_count / len(tasks)
 
-    for task, res in results.items():
-        print(f"Task: {task.upper()}")
-        print(f"--Success: {res['success']}")
-        print(f"--Final Errors: {res['final_errors']}")
-        print("--Steps:")
-
-        for step in res["steps"]:
-            print(f"    > {step['action']} | reward: {step['reward']:.2f} | errors left: {step['remaining_errors']}")
-
-        print()
-
-    print(f"-> Average Score: {avg_score:.2f}")
+    print(
+        f"[END] task=data_cleaning score={avg_score} steps={total_steps}",
+        flush=True
+    )
 
 if __name__ == "__main__":
     main()
