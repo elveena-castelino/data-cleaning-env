@@ -1,12 +1,21 @@
-# Virtual environment
+**pycache**/
+*.pyc
+*.pyo
+*.pyd
+
 .venv/
+venv/
+env/Include/
+env/Lib/
+env/Scripts/
+env/pyvenv.cfg
 
-# Python cache
-__pycache__/
-
-# Env files
 .env
-
-# OS
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
+
+*.log
+dist/
+build/
