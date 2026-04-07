@@ -2,16 +2,14 @@
 
 ## 🚀 Overview
 
-This project implements a **real-world OpenEnv environment** simulating the task of a data analyst cleaning messy datasets.
+This project implements a **real-world OpenEnv environment** simulating the task of a data analyst cleaning unorganised datasets.
 
-Data cleaning is one of the most time-consuming and critical steps in real-world data workflows. This environment allows AI agents to learn and be evaluated on:
+Data cleaning is one of the most time-consuming and important steps in real-world data workflows. This environment allows AI agents to learn and be evaluated on:
 
 * Handling missing values
 * Standardizing inconsistent formats
 * Converting incorrect data types
 * Removing duplicates
-* Fixing real-world noisy data
-
 ---
 
 ## 🎯 Why this matters
@@ -20,7 +18,8 @@ In real-world data science pipelines:
 
 > **Up to 80% of time is spent cleaning data**
 
-This environment models that exact workflow in a structured, testable way — making it highly useful for training and evaluating AI agents.
+This environment models that workflow in a structured, testable way — making it useful for training and evaluating AI agents. 
+The agent being implemented here works on some of the low priority but necessary tasks required during the cleaning of a dataset and it has notable future scope.
 
 ---
 
@@ -80,7 +79,7 @@ The reward is **dense and progressive**, encouraging efficient and correct clean
 ### 🔴 Hard — Real-world Noisy Data
 
 * Duplicates
-* Incorrect types ("thirty")
+* Incorrect types
 * Multiple date formats
 * Extra spaces and inconsistencies
 
@@ -160,7 +159,6 @@ python inference.py
 
 ## 🏆 Key Highlights
 
-* Real-world task simulation
 * Deterministic grading
 * Dense reward shaping
 * Multi-step reasoning environment
@@ -177,13 +175,7 @@ This environment is containerized and deployable on **Hugging Face Spaces** usin
 
 ## 👥 Team
 
-* Team Bug Smashers:
-  Rian, Amogh, Elveena
-
----
-
-## 📌 Final Note
-
-This project demonstrates how structured environments can bridge the gap between **LLMs and real-world decision-making tasks**.
+* This project was made and implemented for the participation in the Meta PyTorch OpenEnv Hackathon x Scaler School of Technology.
+* Created by Team Bug Smashers: Rian, Amogh, Elveena
 
 ---
