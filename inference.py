@@ -1,5 +1,3 @@
-# inference.py
-
 import os
 import requests
 from openai import OpenAI
@@ -9,8 +7,7 @@ from env.environment import DataCleaningEnv
 from dotenv import load_dotenv
 load_dotenv()
 
-
-API_URL = "http://localhost:8000"
+API_URL = "https://elveena05-data-cleaning-env.hf.space"
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
