@@ -1,4 +1,5 @@
 fastapi
+<<<<<<< HEAD
 uvicorn
 pydantic
 openai
@@ -7,3 +8,6 @@ python-dotenv
 numpy
 word2number
 openenv-core
+=======
+uvicorn[standard]
+>>>>>>> 4de9549e9f215b1612d459325fba8eba08bcef4c
