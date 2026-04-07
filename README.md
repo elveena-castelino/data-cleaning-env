@@ -1,177 +1,199 @@
-# 🧾 Data Cleaning Analyst Environment (OpenEnv)
+---
+title: Data Cleaning Environment
+emoji: 🧹
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 8000
+---
 
-## 🚀 Overview
+# 🧹 Data Cleaning Environment API
 
-This project implements a **real-world OpenEnv environment** simulating the task of a data analyst cleaning messy datasets.
+🔗 Live Demo: https://huggingface.co/spaces/elveena05/data-cleaning-env
+🔗 API Docs: https://huggingface.co/spaces/elveena05/data-cleaning-env/docs
 
-Data cleaning is one of the most time-consuming and critical steps in real-world data workflows. This environment allows AI agents to learn and be evaluated on:
-
-* Handling missing values
-* Standardizing inconsistent formats
-* Converting incorrect data types
-* Removing duplicates
-* Fixing real-world noisy data
+A FastAPI-based simulation environment for structured data cleaning tasks, supporting step-wise actions, reward feedback, and evaluation.
 
 ---
 
-## 🎯 Why this matters
+## 🚀 Features
 
-In real-world data science pipelines:
+* Multi-level tasks: Easy, Medium, Hard
+* Action-based data cleaning:
 
-> **Up to 80% of time is spent cleaning data**
-
-This environment models that exact workflow in a structured, testable way — making it highly useful for training and evaluating AI agents.
+  * Fill missing values
+  * Standardize names
+  * Convert data types
+  * Fix date formats
+  * Remove duplicates
+* Reward system for evaluating progress
+* Baseline agent to solve tasks automatically
+* Grader to evaluate final dataset accuracy
 
 ---
 
-## 🧠 Environment Design
+## 📂 Project Structure
 
-### Observation Space
-
-```json
-{
-  "dataset": [...],
-  "step_count": int,
-  "remaining_errors": int
-}
+```bash
+api/            # FastAPI routes
+env/            # Environment logic (core system)
+graders/        # Evaluation logic
+tasks/          # Dataset definitions (easy, medium, hard)
+server/         # Entry point for deployment
 ```
 
 ---
 
-### Action Space
+## ⚙️ Setup & Run Locally
 
-```json
-{
-  "action_type": "fill_missing | standardize_name | convert_type | fix_date_format | remove_duplicates",
-  "column": "optional"
-}
+### 1. Clone repo
+
+```bash
+git clone https://github.com/elveena-castelino/data-cleaning-env.git
+cd data-cleaning-env
 ```
 
 ---
 
-### Reward Function
+### 2. Create virtual environment
 
-The reward is **dense and progressive**, encouraging efficient and correct cleaning:
-
-* +0.15 per error fixed
-* +0.05 efficiency bonus
-* -0.05 for ineffective actions
-* -0.25 for worsening dataset
-* +0.5 completion bonus
+```bash
+python -m venv .venv
+.venv\Scripts\activate   # Windows
+```
 
 ---
 
-## 🧪 Tasks
-
-### 🟢 Easy — Missing Values
-
-* Single error type
-* Objective: fill missing values
-
----
-
-### 🟡 Medium — Mixed Issues
-
-* Missing values + inconsistent formats
-* Requires multi-step reasoning
-
----
-
-### 🔴 Hard — Real-world Noisy Data
-
-* Duplicates
-* Incorrect types ("thirty")
-* Multiple date formats
-* Extra spaces and inconsistencies
-
----
-
-## 🧠 Grading System
-
-Evaluation is deterministic and returns a score between **0.0 → 1.0**.
-
-* Field-level accuracy scoring
-* Partial credit for partially correct rows
-* Exact match yields full score
-
----
-
-## 🤖 Baseline Agent
-
-A hybrid baseline agent is provided:
-
-* Uses rule-based heuristics for stability
-* Falls back to LLM for generalization
-
-This ensures **reproducible and meaningful baseline scores**.
-
----
-
-## 🌐 API Endpoints
-
-| Endpoint    | Description            |
-| ----------- | ---------------------- |
-| `/reset`    | Initialize environment |
-| `/step`     | Apply action           |
-| `/state`    | Get current state      |
-| `/tasks`    | List tasks             |
-| `/grader`   | Get final score        |
-| `/baseline` | Run baseline agent     |
-
----
-
-## 🐳 Setup Instructions
-
-### 1. Install dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run locally
+OR (recommended):
+
+```bash
+pip install uv
+uv sync
+```
+
+---
+
+### 4. Run server
 
 ```bash
 uvicorn api.app:app --reload
 ```
 
-### 3. Run baseline
+---
 
-```bash
-python inference.py
+## 📡 API Endpoints
+
+### 🔹 Reset environment
+
+```http
+POST /reset?task=easy
 ```
 
 ---
 
-## 🧪 Example (Before → After)
+### 🔹 Perform action
 
-### Input
+```http
+POST /step
+```
+
+Example:
 
 ```json
-{"name": "JOHN    DOE", "age": "thirty", "date": "03-12-24"}
+{
+  "action_type": "fill_missing",
+  "column": "age"
+}
 ```
 
-### Output
+---
+
+### 🔹 Get current state
+
+```http
+GET /state
+```
+
+Response:
 
 ```json
-{"name": "John Doe", "age": 30, "date": "2024-03-12"}
+{
+  "step_count": 1,
+  "remaining_errors": 0
+}
 ```
 
 ---
 
-## 🏆 Key Highlights
+### 🔹 Evaluate dataset
 
-* Real-world task simulation
-* Deterministic grading
-* Dense reward shaping
-* Multi-step reasoning environment
-* Fully OpenEnv compliant
-* Dockerized + deployable
+```http
+GET /grader
+```
 
 ---
 
-## 📦 Deployment
+### 🔹 Run baseline agent
 
-This environment is containerized and deployable on **Hugging Face Spaces** using Docker.
+```http
+GET /baseline?task=easy
+```
+
+---
+
+## 🧠 How it Works
+
+* The environment starts with a **dirty dataset**
+* Each action modifies the dataset
+* Errors are tracked dynamically
+* Rewards are assigned based on improvement
+* Goal: reach **0 remaining errors**
+
+---
+
+## 🎯 Example Flow
+
+1. Reset environment
+2. Apply actions step-by-step
+3. Observe rewards and error reduction
+4. Reach a clean dataset
+
+---
+
+## 📸 Sample Output
+
+```json
+{
+  "step_count": 3,
+  "remaining_errors": 0
+}
+```
+
+---
+
+## 🏁 Deployment
+
+This project is compatible with:
+
+* Hugging Face Spaces (Docker)
+* OpenEnv validation system
+
+---
+
+## 📌 Notes
+
+* Date format is standardized to:
+  **"March 12, 2024"**
+* Only `"age"` column is used for:
+
+  * fill_missing
+  * convert_type
 
 ---
 
@@ -183,6 +205,6 @@ This environment is containerized and deployable on **Hugging Face Spaces** usin
 
 ## 📌 Final Note
 
-This project demonstrates how structured environments can bridge the gap between **LLMs and real-world decision-making tasks**.
+This project demonstrates how structured environments enable intelligent decision-making systems by combining rule-based transformations with agent-driven workflows.
 
 ---
