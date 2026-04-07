@@ -9,7 +9,6 @@ app = FastAPI()
 env = None
 task_data = None
 
-
 class ResetRequest(BaseModel):
     task: str = "easy"
 
