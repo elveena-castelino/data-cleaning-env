@@ -153,7 +153,7 @@ class DataCleaningEnv:
             for fmt in formats:
                 try:
                     parsed = datetime.strptime(val, fmt)
-                    r["date"] = parsed.strftime("%B %d, %Y")  # ALWAYS word format
+                    r["date"] = parsed.strftime("%B %d, %Y")  # word format
                     break
                 except ValueError:
                     continue
