@@ -51,7 +51,7 @@ def run_task(task_name):
 
     done = False
 
-    for _ in range(50):
+    for _ in range(10):
         action = choose_action(obs.dict())
         result = env.step(action)
 
@@ -76,13 +76,27 @@ def run_baseline(task):
     ]
 
     history = []
-    result = None
+        
+    for _ in range(10):
+        best_action = None
+        best_result = None
+        best_reward = -float("inf")
 
-    for action in actions:
-        result = env.step(action)
+        #Try all actions and pick best one
+        for action in actions:
+            test_env = DataCleaningEnv(task)
+            test_env.dataset = [row.copy() for row in env.dataset]
+            result = test_env.step(action)
+            if result.reward > best_reward:
+                best_reward = result.reward
+                best_action = action
+                best_result = result
+
+        #Applying best action
+        result = env.step(best_action)
 
         history.append({
-            "action": action.action_type,
+            "action": best_action.action_type,
             "reward": float(result.reward),
             "remaining_errors": int(result.observation.remaining_errors)
         })
@@ -104,4 +118,18 @@ if __name__ == "__main__":
     for task in tasks:
         results[task] = run_baseline(task)
 
-    print(results)
+    avg_score = sum(1 if r["success"] else 0 for r in results.values()) / len(results)
+
+    print("\nDATA CLEANING AGENT RESULTS\n")
+
+    for task, res in results.items():
+        print(f"Task: {task.upper()}")
+        print(f"--Success: {'True' if res['success'] else 'False'}")
+        print(f"--Final Errors: {res['final_errors']}")
+        print("--Steps:")
+
+        for step in res["steps"]:
+            print(f"    > {step['action']} | reward: {step['reward']:.2f} | errors left: {step['remaining_errors']}")
+
+        print()
+    print(f"-> Average Score: {avg_score:.2f}")
