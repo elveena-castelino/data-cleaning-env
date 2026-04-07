@@ -1,8 +1,11 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 WORKDIR /app
-COPY . .
 
-RUN pip install -r requirements.txt
+COPY . /app
 
-CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "7860"]
+RUN pip install --no-cache-dir fastapi uvicorn
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
