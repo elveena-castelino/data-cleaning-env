@@ -1,6 +1,13 @@
-from env.dataset import get_task
+from env.dataset import load_task_dataset
 
 def load_task(name):
-    if name in ["easy", "medium", "hard"]:
-        return get_task(name)
-    raise ValueError("Invalid task")
+    if name not in ["easy", "medium", "hard"]:
+        raise ValueError("Invalid task")
+
+    dataset, ground_truth = load_task_dataset(name)
+
+    return {
+        "dataset": dataset,
+        "ground_truth": ground_truth,
+    }
+TASKS = ["easy", "medium", "hard"]
