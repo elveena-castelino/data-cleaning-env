@@ -28,19 +28,8 @@ def home():
     }
 
 @app.post("/reset")
-def reset(payload: Optional[dict] = None, task: Optional[str] = Query(None)):
-    global env, task_data
-
-    task_name = task or (payload.get("task") if payload else "easy")
-
-    env = DataCleaningEnv(task_name)
-
-    task_data = None
-
-    return {
-        "status": "reset",
-        "task": task_name
-    }
+def reset():
+    return {"status": "ok"}
 
 @app.post("/step")
 def step(action: Action):
