@@ -10,9 +10,10 @@ def normalize_date(date_str):
             continue
     return None
 
+
 def grade_dataset(predicted, ground_truth):
     if len(predicted) != len(ground_truth):
-        return 0.0
+        return 0.01
 
     total, correct = 0, 0
 
@@ -27,4 +28,10 @@ def grade_dataset(predicted, ground_truth):
                 if p.get(k) == g.get(k):
                     correct += 1
 
-    return correct / total if total else 0.0
+    if total == 0:
+        return 0.01
+
+    score = correct / total
+
+    # ✅ Clamp into (0,1)
+    return max(0.01, min(0.99, score))
