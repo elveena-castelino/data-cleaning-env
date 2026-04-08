@@ -1,5 +1,8 @@
 from datetime import datetime
 
+MIN_SCORE = 0.01
+SCORE_RANGE = 0.98
+
 def normalize_date(date_str):
     formats = ["%B %d, %Y", "%Y-%m-%d", "%d/%m/%Y"]
 
@@ -12,7 +15,7 @@ def normalize_date(date_str):
 
 def grade_dataset(predicted, ground_truth):
     if len(predicted) != len(ground_truth):
-        return 0.01
+        return MIN_SCORE
 
     total, correct = 0, 0
 
@@ -28,4 +31,4 @@ def grade_dataset(predicted, ground_truth):
                     correct += 1
 
     raw_score = correct / total if total else 0.0
-    return 0.01 + (0.98 * raw_score)
+    return MIN_SCORE + (SCORE_RANGE * raw_score)
