@@ -1,11 +1,9 @@
 from fastapi import FastAPI
-from typing import Optional
 
 app = FastAPI()
 
-# Global state
+# Global env
 env = None
-task_data = None
 
 
 # ----------------------------
@@ -13,33 +11,20 @@ task_data = None
 # ----------------------------
 @app.get("/")
 def home():
-    return {
-        "status": "running",
-        "message": "Data Cleaning Environment API",
-        "endpoints": [
-            "/reset",
-            "/step",
-            "/state",
-            "/tasks",
-            "/grader",
-            "/baseline",
-            "/docs"
-        ]
-    }
+    return {"status": "running"}
 
 
 # ----------------------------
-# RESET (FAST ⚡)
+# RESET (VERY FAST ⚡)
 # ----------------------------
 @app.post("/reset")
 def reset():
-    global env, task_data
+    global env
 
-    # Lazy import (CRITICAL FIX)
+    # Lazy import (only when needed)
     from env.environment import DataCleaningEnv
 
     env = DataCleaningEnv("easy")
-    task_data = None
 
     return {"status": "ok"}
 
@@ -49,19 +34,14 @@ def reset():
 # ----------------------------
 @app.post("/step")
 def step(action: dict):
-    global env, task_data
+    global env
 
     if env is None:
-        return {"error": "Environment not initialized. Call /reset first."}
+        return {"error": "Call /reset first"}
 
-    # Lazy imports
     from env.models import Action
-    from tasks import load_task
 
     action_obj = Action(**action)
-
-    if task_data is None:
-        task_data = load_task(env.task_name)
 
     return env.step(action_obj)
 
@@ -70,11 +50,11 @@ def step(action: dict):
 # STATE
 # ----------------------------
 @app.get("/state")
-def get_state():
+def state():
     global env
 
     if env is None:
-        return {"error": "Environment not initialized."}
+        return {"error": "Call /reset first"}
 
     return env.state()
 
@@ -83,23 +63,5 @@ def get_state():
 # TASKS
 # ----------------------------
 @app.get("/tasks")
-def get_tasks():
-    return {
-        "tasks": ["easy", "medium", "hard"]
-    }
-
-
-# ----------------------------
-# GRADER
-# ----------------------------
-@app.get("/grader")
-def grader():
-    return {"status": "grader endpoint ready"}
-
-
-# ----------------------------
-# BASELINE
-# ----------------------------
-@app.get("/baseline")
-def baseline():
-    return {"status": "baseline ready"}
+def tasks():
+    return {"tasks": ["easy", "medium", "hard"]}
