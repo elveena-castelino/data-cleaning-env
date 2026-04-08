@@ -16,21 +16,15 @@ def home():
 
 
 @app.post("/reset")
-def reset(task: str = "easy"):
+def reset():
     global env, task_data
 
-    if task not in ["easy", "medium", "hard"]:
-        raise HTTPException(status_code=400, detail="Invalid task")
+    task = "easy"   # hardcode default
 
     task_data = load_task(task)
     env = DataCleaningEnv(task)
 
-    result = env.reset()
-    
-    if not isinstance(result, dict):
-        result = {"state": result}
-
-    return result
+    return env.reset()
 
 
 @app.post("/step")
