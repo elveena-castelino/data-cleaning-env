@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from env.environment import DataCleaningEnv
 from env.models import Action
+from pydantic import BaseModel
 from graders.grader import grade_dataset
 from tasks import load_task
 
@@ -13,9 +14,13 @@ task_data = None
 def home():
     return {"message": "Data Cleaning API is running"}
 
+class ResetRequest(BaseModel):
+    task: str = "easy"
+
 @app.post("/reset")
-def reset(task: str = "easy"):
+def reset(req: ResetRequest):
     global env, task_data
+    task = req.task
 
     if task not in ["easy", "medium", "hard"]:
         raise HTTPException(status_code=400, detail="Invalid task")
