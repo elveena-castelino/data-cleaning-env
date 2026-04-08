@@ -10,7 +10,6 @@ from tasks import load_task
 
 load_dotenv()
 
-# ✅ REQUIRED ENV VARIABLES
 API_BASE_URL = os.getenv("API_BASE_URL", "<your-active-endpoint>")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 HF_TOKEN = os.getenv("HF_TOKEN")
@@ -20,7 +19,6 @@ TEMPERATURE = 0.2
 MAX_TOKENS = 200
 
 client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
-
 
 def choose_action(observation):
     prompt = f"""
@@ -57,7 +55,6 @@ def choose_action(observation):
     except Exception:
         return Action(action_type="standardize_name")
 
-
 def get_best_action(env, task, llm_action):
     actions = [
         Action(action_type="standardize_name"),
@@ -83,7 +80,6 @@ def get_best_action(env, task, llm_action):
 
     return best_action
 
-
 def run_agent(task):
     env = DataCleaningEnv(task)
     obs = env.reset()
@@ -92,7 +88,6 @@ def run_agent(task):
     steps_taken = 0
     result = None
 
-    # ✅ START (per task)
     print(f"[START] task={task} env=data_cleaning_env model={MODEL_NAME}", flush=True)
 
     try:
@@ -135,13 +130,11 @@ def run_agent(task):
 
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
 
-    # ✅ END (per task)
     print(
         f"[END] success={str(success).lower()} steps={steps_taken} "
         f"score={score:.3f} rewards={rewards_str}",
         flush=True
     )
-
 
 def main():
     tasks = ["easy", "medium", "hard"]
