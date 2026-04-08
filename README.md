@@ -1,6 +1,15 @@
+---
+title: Data Cleaning Agent
+emoji: 🧹
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_file: inference.py
+pinned: true
+---
 # 🧾 Data Cleaning Analyst Environment (OpenEnv)
 
-## 🚀 Overview
+## Overview
 
 This project implements a **real-world OpenEnv environment** simulating the task of a data analyst cleaning unorganised datasets.
 
@@ -12,7 +21,7 @@ Data cleaning is one of the most time-consuming and important steps in real-worl
 * Removing duplicates
 ---
 
-## 🎯 Why this matters
+## Why this matters
 
 In real-world data science pipelines:
 
@@ -23,7 +32,7 @@ The agent being implemented here works on some of the low priority but necessary
 
 ---
 
-## 🧠 Environment Design
+## Environment Design
 
 ### Observation Space
 
@@ -60,23 +69,23 @@ The reward is **dense and progressive**, encouraging efficient and correct clean
 
 ---
 
-## 🧪 Tasks
+## Tasks
 
-### 🟢 Easy — Missing Values
+### Easy — Missing Values
 
 * Single error type
 * Objective: fill missing values
 
 ---
 
-### 🟡 Medium — Mixed Issues
+### Medium — Mixed Issues
 
 * Missing values + inconsistent formats
 * Requires multi-step reasoning
 
 ---
 
-### 🔴 Hard — Noisy Data
+### Hard — Noisy Data
 
 * Duplicates
 * Incorrect types
@@ -85,7 +94,7 @@ The reward is **dense and progressive**, encouraging efficient and correct clean
 
 ---
 
-## 🧠 Grading System
+## Grading System
 
 Evaluation is deterministic and returns a score between **0.0 → 1.0**.
 
@@ -95,7 +104,7 @@ Evaluation is deterministic and returns a score between **0.0 → 1.0**.
 
 ---
 
-## 🤖 Baseline Agent
+## Baseline Agent
 
 A hybrid baseline agent is provided:
 
@@ -106,7 +115,7 @@ This ensures **reproducible and meaningful baseline scores**.
 
 ---
 
-## 🌐 API Endpoints
+## API Endpoints
 
 | Endpoint    | Description            |
 | ----------- | ---------------------- |
@@ -119,7 +128,7 @@ This ensures **reproducible and meaningful baseline scores**.
 
 ---
 
-## 🐳 Setup Instructions
+## Setup Instructions
 
 ### 1. Install dependencies
 
@@ -141,7 +150,7 @@ python inference.py
 
 ---
 
-## 🧪 Example (Before → After)
+## Example (Before → After)
 
 ### Input
 
@@ -157,7 +166,7 @@ python inference.py
 
 ---
 
-## 🏆 Key Highlights
+## Key Highlights
 
 * Deterministic grading
 * Dense reward shaping
@@ -167,13 +176,13 @@ python inference.py
 
 ---
 
-## 📦 Deployment
+## Deployment
 
 This environment is containerized and deployable on **Hugging Face Spaces** using Docker.
 
 ---
 
-## 👥 Team
+## Team
 
 * This project was made and implemented for the participation in the Meta PyTorch OpenEnv Hackathon x Scaler School of Technology.
 * Created by Team Bug Smashers: Rian, Amogh, Elveena
