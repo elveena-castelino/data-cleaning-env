@@ -1,11 +1,15 @@
 import copy
 from datetime import datetime
 from .models import Observation, Action, StepResult
+from tasks import load_task
+from graders.grader import grade_dataset
+from word2number import w2n
 
 MAX_STEPS = 10
 
 class DataCleaningEnv:
     def __init__(self, task_name="easy"):
+        # Only store task name (NO heavy loading here)
         self.task_name = task_name
 
         self.original_dataset = None
@@ -15,7 +19,6 @@ class DataCleaningEnv:
         self.step_count = 0
 
     def reset(self):
-        from tasks import load_task
         if self.original_dataset is None:
             task = load_task(self.task_name)
             self.original_dataset = task["dataset"]
@@ -71,7 +74,6 @@ class DataCleaningEnv:
         )
 
     def get_score(self):
-        from graders.grader import grade_dataset
         return grade_dataset(self.dataset, self.ground_truth)
 
     def _count_errors(self, dataset):
@@ -125,7 +127,6 @@ class DataCleaningEnv:
                 r["name"] = name.title()
 
     def _convert_type(self, column):
-        from word2number import w2n
         for r in self.dataset:
             val = r.get(column)
 
