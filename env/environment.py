@@ -6,7 +6,6 @@ MAX_STEPS = 10
 
 class DataCleaningEnv:
     def __init__(self, task_name="easy"):
-        # Only store task name (NO heavy loading here)
         self.task_name = task_name
 
         self.original_dataset = None

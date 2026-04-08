@@ -5,16 +5,15 @@ description = "Data Cleaning Environment API"
 requires-python = ">=3.10"
 
 dependencies = [
-"numpy",
-"fastapi",
-"uvicorn",
-"pydantic",
-"openai",
-"requests",
-"python-dotenv",
-"word2number",
-"openenv-core>=0.2.0"
+    "numpy>=1.24",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "pydantic>=2.6",
+    "openai>=1.0",
+    "requests",
+    "python-dotenv",
+    "word2number",
+    "huggingface_hub",
+    "openenv-core>=0.2.0",
+    "python-multipart"
 ]
-
-[project.scripts]
-server = "server.app:main"
