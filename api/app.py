@@ -9,6 +9,9 @@ app = FastAPI(title="Data Cleaning Environment API")
 env = None
 task_data = None
 
+@app.get("/")
+def home():
+    return {"message": "Data Cleaning API is running"}
 
 @app.post("/reset")
 def reset(task: str = "easy"):
