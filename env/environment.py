@@ -9,16 +9,25 @@ MAX_STEPS = 10
 
 class DataCleaningEnv:
     def __init__(self, task_name="easy"):
-        task = load_task(task_name)
-        self.original_dataset = task["dataset"]
-        self.ground_truth = task["ground_truth"]
+        # Only store task name (NO heavy loading here)
+        self.task_name = task_name
+
+        self.original_dataset = None
+        self.ground_truth = None
 
         self.dataset = None
         self.step_count = 0
 
     def reset(self):
+        # Lazy load ONLY when needed
+        if self.original_dataset is None:
+            task = load_task(self.task_name)
+            self.original_dataset = task["dataset"]
+            self.ground_truth = task["ground_truth"]
+
         self.dataset = copy.deepcopy(self.original_dataset)
         self.step_count = 0
+
         return self._get_observation()
 
     def state(self):
@@ -64,7 +73,7 @@ class DataCleaningEnv:
             step_count=self.step_count,
             remaining_errors=self._count_errors(self.dataset)
         )
-        
+
     def get_score(self):
         return grade_dataset(self.dataset, self.ground_truth)
 
@@ -135,11 +144,11 @@ class DataCleaningEnv:
 
     def _fix_date(self):
         formats = [
-        "%B %d, %Y",   # original 
-        "%d/%m/%Y",    # 12/03/2024
-        "%d-%m-%y",    # 12-03-24
-        "%Y/%m/%d",    # 2024/03/12
-        "%Y-%m-%d",    # fallback if exists
+            "%B %d, %Y",
+            "%d/%m/%Y",
+            "%d-%m-%y",
+            "%Y/%m/%d",
+            "%Y-%m-%d",
         ]
 
         for r in self.dataset:
@@ -153,7 +162,7 @@ class DataCleaningEnv:
             for fmt in formats:
                 try:
                     parsed = datetime.strptime(val, fmt)
-                    r["date"] = parsed.strftime("%B %d, %Y")  # word format
+                    r["date"] = parsed.strftime("%B %d, %Y")
                     break
                 except ValueError:
                     continue
@@ -167,4 +176,5 @@ class DataCleaningEnv:
             if key not in seen:
                 seen.add(key)
                 unique.append(r)
+
         self.dataset = unique
