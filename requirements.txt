@@ -6,4 +6,4 @@ openai
 requests
 python-dotenv
 word2number
-openenv-core
+openenv-core>=0.2.0

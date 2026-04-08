@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Literal
 
 class Observation(BaseModel):
@@ -20,4 +20,4 @@ class StepResult(BaseModel):
     observation: Observation
     reward: float
     done: bool
-    info: Dict = {}
+    info: Dict = Field(default_factory=dict)
